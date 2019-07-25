@@ -1,6 +1,7 @@
 import { Router } from '../common/router'
 import * as restify from 'restify'
 import { User } from './users.model'
+import { DocumentQuery } from 'mongoose';
 
 class UsersRouter extends Router {
     applyRoutes(application: restify.Server) {
@@ -34,6 +35,24 @@ class UsersRouter extends Router {
 
                 return next()
             })
+        })
+
+        application.put('/users/:id', (req, res, next) => {
+            // in theory, PUT replaces an object, but the mongoose update() would partially update the document, hence this option to overwrite it
+            const options = { overwrite: true }
+
+            User.update({ _id: req.params.id }, req.body, options)
+                .exec().then(result => {
+                    if (result.n) {
+                        return User.findById(req.params.id).exec()
+                    } else {
+                        res.send(404)
+                    }
+                }).then(user => {
+                    res.json(user)
+
+                    return next()
+                })
         })
     }
 }
