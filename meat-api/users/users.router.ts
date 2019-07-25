@@ -54,6 +54,24 @@ class UsersRouter extends Router {
                     return next()
                 })
         })
+
+        application.patch('/users/:id', (req, res, next) => {
+            // by default findByIdAndUpdate() returns the old document (before update)
+            // this option makes the findByIdAndUpdate() return the new document (with the updates apllied)
+            const options = { new: true }
+
+            User.findByIdAndUpdate(req.params.id, req.body, options).then(user => {
+                if (user) {
+                    res.json(user)
+
+                    return next()
+                }
+
+                res.send(404)
+
+                return next()
+            })
+        })
     }
 }
 
