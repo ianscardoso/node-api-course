@@ -1,7 +1,7 @@
 import { Router } from '../common/router'
 import * as restify from 'restify'
 import { User } from './users.model'
-import { DocumentQuery } from 'mongoose';
+import { NotFoundError } from 'restify-errors'
 
 class UsersRouter extends Router {
     constructor() {
@@ -15,32 +15,36 @@ class UsersRouter extends Router {
         application.get('/users', (req, res, next) => {
             User.find()
                 .then(this.render(res, next))
+                .catch(next)
         })
 
         application.get('/users/:id', (req, res, next) => {
             User.findById(req.params.id)
                 .then(this.render(res, next))
+                .catch(next)
         })
 
         application.post('/users', (req, res, next) => {
             let user = new User(req.body)
             user.save()
                 .then(this.render(res, next))
+                .catch(next)
         })
 
         application.put('/users/:id', (req, res, next) => {
             // in theory, PUT replaces an object, but the mongoose update() would partially update the document, hence this option to overwrite it
             const options = { overwrite: true }
 
-            User.update({ _id: req.params.id }, req.body, options)
-                .exec().then(result => {
+            User.update({ _id: req.params.id }, req.body, options).exec()
+                .then(result => {
                     if (result.n) {
                         return User.findById(req.params.id).exec()
                     } else {
-                        res.send(404)
+                        throw new NotFoundError('Document not found')
                     }
                 })
                 .then(this.render(res, next))
+                .catch(next)
         })
 
         application.patch('/users/:id', (req, res, next) => {
@@ -50,19 +54,21 @@ class UsersRouter extends Router {
 
             User.findByIdAndUpdate(req.params.id, req.body, options)
                 .then(this.render(res, next))
+                .catch(next)
         })
 
         application.del('/users/:id', (req, res, next) => {
-            User.remove({ _id: req.params.id })
-                .exec().then((cmdResult: any) => {
+            User.remove({ _id: req.params.id }).exec()
+                .then((cmdResult: any) => {
                     if (cmdResult.result.n) {
                         res.send(204)
                     } else {
-                        res.send(404)
+                        throw new NotFoundError('Document not found')
                     }
 
                     return next()
                 })
+                .catch(next)
         })
     }
 }
