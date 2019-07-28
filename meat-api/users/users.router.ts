@@ -33,7 +33,10 @@ class UsersRouter extends Router {
 
         application.put('/users/:id', (req, res, next) => {
             // in theory, PUT replaces an object, but the mongoose update() would partially update the document, hence this option to overwrite it
-            const options = { overwrite: true }
+            const options = {
+                runValidators: true,
+                overwrite: true
+            }
 
             User.update({ _id: req.params.id }, req.body, options).exec()
                 .then(result => {
@@ -50,7 +53,10 @@ class UsersRouter extends Router {
         application.patch('/users/:id', (req, res, next) => {
             // by default findByIdAndUpdate() returns the old document (before update)
             // this option makes the findByIdAndUpdate() return the new document (with the updates apllied)
-            const options = { new: true }
+            const options = {
+                runValidators: true,
+                new: true
+            }
 
             User.findByIdAndUpdate(req.params.id, req.body, options)
                 .then(this.render(res, next))
