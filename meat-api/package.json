@@ -1,9 +1,11 @@
 {
   "name": "meat-api",
   "version": "1.0.0",
-  "description": "API de Restaurantes",
-  "main": "index.js",
+  "description": "Restaurants API",
+  "main": "main.ts",
   "scripts": {
+    "prestart": "start d:/MongoDB/Server/4.0/bin/mongod.exe --dbpath=d:/MongoDB/Server/4.0/data/",
+    "start": "tsc -w | nodemon dist/main.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],
