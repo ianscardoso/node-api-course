@@ -7,7 +7,7 @@ class ReviewsRouter extends ModelRouter<Review>{
     constructor() {
         super(Review)
     }
-A
+    
     envelope(document){
         let resource = super.envelope(document)
         const restaurantId = document.restaurant._id ? document.restaurant._id : document.restaurant
