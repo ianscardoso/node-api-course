@@ -48,6 +48,39 @@ test('post /users', () => {
         .catch(fail)
 })
 
+test('get /users/aaa - not found', () => {
+    return request(address)
+        .get('/users/aaa')
+        .then(response => {
+            expect(response.status).toBe(404)
+        })
+        .catch(fail)
+})
+
+test('patch /users/:id', () => {
+    return request(address)
+        .post('/users')
+        .send({
+            name: 'user test 2',
+            email: 'usertest2@email.com',
+            password: 'test'
+        })
+        .then(response =>
+            request(address)
+                .patch(`/users/${response.body._id}`)
+                .send({
+                    name: 'user test 2 - patch'
+                }))
+        .then(response => {
+            expect(response.status).toBe(200)
+            expect(response.body._id).toBeDefined()
+            expect(response.body.name).toBe('user test 2 - patch')
+            expect(response.body.email).toBe('usertest2@email.com')
+            expect(response.body.password).toBeUndefined()
+        })
+        .catch(fail)
+})
+
 afterAll(() => {
     return server.shutdown()
 })
